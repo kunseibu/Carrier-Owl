@@ -3,10 +3,16 @@ subject: 'cat:cs.*'
 
 # 検索キーワード
 keywords:
-        deep learning: 1
-        a: 1
-        security: 1
-        Transport: 1
+        deep: 1
+        learning: 1
+        reinforcement: 1
+        model: 1
+        network: 1
+        cnn: 1
+        rnn: 1
+        transformer: 1
+        proof: 1
+        coq: 1
 
 # 通知の閾値
 score_threshold: 0
