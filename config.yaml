@@ -4,6 +4,7 @@ subject: 'cat:cs.*'
 # 検索キーワード
 keywords:
         deep learning: 1
+        a: 1
 
 # 通知の閾値
 score_threshold: 0
