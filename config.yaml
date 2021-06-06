@@ -5,6 +5,7 @@ subject: 'cat:cs.*'
 keywords:
         deep learning: 1
         a: 1
+        security: 1
 
 # 通知の閾値
 score_threshold: 0
