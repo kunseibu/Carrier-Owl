@@ -118,13 +118,13 @@ def notify(results: list, slack_id: str, line_token: str) -> None:
         word = result.words
         score = result.score
 
-        text = f'\n score: `{score}`'\
-               f'\n hit keywords: `{word}`'\
-               f'\n url: {url}'\
-               f'\n title:    {title}'\
+        text = f'\n title:    {title}'\
                f'\n abstract:'\
                f'\n \t {abstract}'\
-               f'\n {star}'
+               f'\n {star}'\
+               f'\n url: {url}'\
+               f'\n score: `{score}`'\
+               f'\n hit keywords: `{word}`'
 
         send2app(text, slack_id, line_token)
 
