@@ -64,7 +64,7 @@ def filter_by_keywords(
 
     return results
 
-def to_translated_results(results: list[Result]):
+def to_translated_results(results: list):
     results_trans = []
     for result in results:
         time.sleep(2)
