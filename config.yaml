@@ -16,3 +16,6 @@ keywords:
 
 # 通知の閾値
 score_threshold: 0
+
+# 通知数のの制限（score で降順ソート後）
+max_notify_num: 30

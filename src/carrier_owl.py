@@ -39,7 +39,7 @@ def calc_score(abst: str, keywords: dict) -> (float, list):
     return sum_score, hit_kwd_list
 
 
-def search_keyword(
+def filter_by_keywords(
         articles: list, keywords: dict, score_threshold: float
         ) -> list:
     results = []
@@ -48,19 +48,42 @@ def search_keyword(
         url = article['arxiv_url']
         title = article['title']
         abstract = article['summary']
+
         score, hit_keywords = calc_score(abstract, keywords)
+
         if (score != 0) and (score >= score_threshold):
-            title_trans = get_translated_text('ja', 'en', title)
-            abstract = abstract.replace('\n', '')
-            abstract_trans = get_translated_text('ja', 'en', abstract)
-            abstract_trans = textwrap.wrap(abstract_trans, 40)  # 40行で改行
-            abstract_trans = '\n'.join(abstract_trans)
+            # title_trans = get_translated_text('ja', 'en', title)
+            # abstract = abstract.replace('\n', '')
+            # abstract_trans = get_translated_text('ja', 'en', abstract)
+            # abstract_trans = textwrap.wrap(abstract_trans, 40)  # 40行で改行
+            # abstract_trans = '\n'.join(abstract_trans)
             result = Result(
-                    url=url, title=title_trans, abstract=abstract_trans,
+                    url=url, title=title, abstract=abstract,
                     score=score, words=hit_keywords)
             results.append(result)
+
     return results
 
+def to_translated_results(results: list[Result]):
+    results_trans = []
+    for result in results:
+        time.sleep(2)
+
+        title_trans = get_translated_text('ja', 'en', result.title)
+
+        abstract = result.abstract
+        abstract = abstract.replace('\n', '')
+        abstract_trans = get_translated_text('ja', 'en', abstract)
+        abstract_trans = textwrap.wrap(abstract_trans, 40)  # 40行で改行
+        abstract_trans = '\n'.join(abstract_trans)
+
+        result_trans = Result(
+                url=url, title=title_trans, abstract=abstract_trans,
+                score=score, words=hit_keywords)
+
+        results_trans.append(result_trans)
+
+    return results_trans
 
 def send2app(text: str, slack_id: str, line_token: str) -> None:
     # slack
@@ -101,6 +124,7 @@ def notify(results: list, slack_id: str, line_token: str) -> None:
 
         send2app(text, slack_id, line_token)
 
+        time.sleep(2)
 
 def get_translated_text(from_lang: str, to_lang: str, from_text: str) -> str:
     '''
@@ -165,6 +189,7 @@ def main():
     config = get_config()
     subject = config['subject']
     keywords = config['keywords']
+    max_notify_num = config['max_notify_num']
     score_threshold = float(config['score_threshold'])
 
     day_before_yesterday = datetime.datetime.today() - datetime.timedelta(days=2)
@@ -177,12 +202,14 @@ def main():
                            max_results=1000,
                            sort_by='submittedDate',
                            iterative=False)
-    results = search_keyword(articles, keywords, score_threshold)
+                           
+    results = filter_by_keywords(articles, keywords, score_threshold)
+    results = list(sorted(results, reverse=True, key=lambda x: x.score))[:max_notify_num]
+    results_trans = to_translated_results(results)
 
     slack_id = os.getenv("SLACK_ID") or args.slack_id
     line_token = os.getenv("LINE_TOKEN") or args.line_token
-    notify(results, slack_id, line_token)
-
+    notify(results_trans, slack_id, line_token)
 
 if __name__ == "__main__":
     main()
