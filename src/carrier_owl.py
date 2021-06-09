@@ -69,7 +69,11 @@ def to_translated_results(results: list):
     for result in results:
         time.sleep(2)
 
+        print(f"translating {result.title}...")
+
         title_trans = get_translated_text('ja', 'en', result.title)
+
+        print("done.")
 
         abstract = result.abstract
         abstract = abstract.replace('\n', '')
@@ -78,8 +82,8 @@ def to_translated_results(results: list):
         abstract_trans = '\n'.join(abstract_trans)
 
         result_trans = Result(
-                url=url, title=title_trans, abstract=abstract_trans,
-                score=score, words=hit_keywords)
+                url=result.url, title=title_trans, abstract=abstract_trans,
+                score=result.score, words=result.words)
 
         results_trans.append(result_trans)
 
@@ -125,6 +129,8 @@ def notify(results: list, slack_id: str, line_token: str) -> None:
         send2app(text, slack_id, line_token)
 
         time.sleep(2)
+
+        print(f"Article '{title}' has been notified.")
 
 def get_translated_text(from_lang: str, to_lang: str, from_text: str) -> str:
     '''
@@ -202,6 +208,8 @@ def main():
                            max_results=1000,
                            sort_by='submittedDate',
                            iterative=False)
+
+    print(f"Retrieved {len(articles)} articles from arxiv.")
                            
     results = filter_by_keywords(articles, keywords, score_threshold)
     results = list(sorted(results, reverse=True, key=lambda x: x.score))[:max_notify_num]
